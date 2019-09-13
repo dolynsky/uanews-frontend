@@ -1,41 +1,51 @@
 import React from "react";
 import "./App.css";
-import dataLoader from "./data/dataLoader";
 import Topic from "./components/Topic";
+import Loader from "./components/Loader";
+import InfiniteScroll from "react-infinite-scroller";
+import moment from "moment";
+import "moment/locale/uk";
+import axios from "axios";
 
 class App extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
             topics: [],
-            filters: ["злочин", "зник"],
-            isLoading: true
+            hasMoreItems: true
         };
+        moment.locale("uk");
     }
 
-    async componentDidMount() {
-        const topics = await dataLoader();
-        this.setState({ topics, isLoading: false });
-    }
-
-    checker(topic) {
-        for (const filter of this.state.filters) {
-            if (topic.Title.includes(filter)) {
-                return true;
-            }
-        }
-        return false;
+    loadItems(page) {
+        console.log("loadItems:", page);
+        axios.get(`/api/topics/${page}`)
+        .then(res => {
+            const newTopics = res.data;
+            this.setState(prevState => {
+                const topics = [...prevState.topics];
+                newTopics.forEach(topic => {
+                    if (!topics.find(el => el._id === topic._id)) {
+                        topics.push(topic);
+                    }
+                });
+                return {
+                    topics,
+                    hasMoreItems: newTopics.length === 50
+                }
+            })
+        })
     }
 
     render() {
-        const filtered = this.state.topics.filter(this.checker.bind(this));
         return (
-            <div className="container">
-                {this.state.isLoading && <div>Loading...</div>}
-                {filtered.map(topic => (
-                    <Topic key={topic.Id} {...topic} />
-                ))}
-            </div>
+            <InfiniteScroll pageStart={0} loadMore={this.loadItems.bind(this)} hasMore={this.state.hasMoreItems} loader={<Loader />}>
+                <div className="container col-12 col-md-8">
+                    {this.state.topics.map(topic => (
+                        <Topic key={topic._id} {...topic} />
+                    ))}
+                </div>
+            </InfiniteScroll>
         );
     }
 }
