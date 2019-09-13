@@ -4,8 +4,12 @@ import moment from "moment";
 import Rating from "./Rating";
 
 export default class Topic extends React.PureComponent {
+    handleClick() {
+        window.open(this.props.url, "_blank");
+    }
+
     render() {
-        const { date, region, url, title, titleMatches, contentMatches } = this.props;
+        const { date, region, title, titleMatches, contentMatches, isNew } = this.props;
 
         const m = moment(date);
         var isCurrentDate = m.isSame(new Date(), "day");
@@ -13,7 +17,7 @@ export default class Topic extends React.PureComponent {
         const rating = Math.min(titleMatches + Math.max(contentMatches - 2, 0), 3);
 
         return (
-            <div className="topic">
+            <div className={`topic ${isNew && "topic-new"}`} onClick={this.handleClick.bind(this)}>
                 <div className="topic-info">
                     <div className="time pr-2">
                         <i className="far fa-clock time pr-1"></i>
@@ -22,10 +26,8 @@ export default class Topic extends React.PureComponent {
                     <span className="region">{region}</span>
                 </div>
                 <div className="topic-title">
-                    <a className="" href={url}>
-                        {`${title} (${titleMatches}, ${contentMatches}, ${rating})`}
-                        <Rating value={rating}/>
-                    </a>
+                    {title}
+                    <Rating value={rating} />
                 </div>
             </div>
         );

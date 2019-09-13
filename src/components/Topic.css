@@ -5,7 +5,11 @@
     font-size: .9rem;
     background-color: #394264;
     border-bottom: 1px solid #1f253d;
-    /* box-shadow: 0px 1px 2px rgba(0,0,0,0.2); */
+    cursor: pointer;
+}
+
+.topic:hover {
+    background-color: #232a44;
 }
 
 .topic:first-child {
@@ -27,7 +31,7 @@
 }
 
 .topic-title {
-
+    color: #fff;
 }
 
 .region {
@@ -42,10 +46,11 @@
     /* color: #fff; */
 }
 
-a {
-    color: #fff;
+.topic-new {
+    animation: fadein 1s;
 }
 
-a:hover, a:visited {
-    color: #fff;
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
